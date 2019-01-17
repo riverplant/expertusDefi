@@ -3,3 +3,6 @@ jyx-security-core:核心代码
 jyx-security-browser:浏览器端调用代码及方法
 jyx-security-app:app端调用代码及方法
 jyx-security-demo:测试代码1
+
+$ cd J:\repository
+$ git push -f
