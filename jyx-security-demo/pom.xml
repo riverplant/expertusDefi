@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>jyx-security-demo</artifactId>
+  <parent>
+  	<groupId>com.jyx.security</groupId>
+  	<artifactId>jyx-security</artifactId>
+  	<version>1.0.0-SNAPSHOT</version>
+  	<relativePath>../jyx-security</relativePath>
+  </parent>
+   <dependencies>
+  <!-- 测试端先从浏览器开始，所以引入jyx-security-browser -->
+		<dependency>
+		<groupId>com.jyx.security</groupId>
+		<artifactId>jyx-security-browser</artifactId>
+		<version>${jyx.security.version}</version>
+		</dependency>
+		</dependencies>
+</project>
