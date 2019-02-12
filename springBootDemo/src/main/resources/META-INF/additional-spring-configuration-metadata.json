@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "river.secret",
+    "type": "java.lang.String",
+    "description": "A description for 'river.secret'"
+  },
+  {
+    "name": "river.number",
+    "type": "java.lang.String",
+    "description": "A description for 'river.number'"
+  },
+  {
+    "name": "river.name",
+    "type": "java.lang.String",
+    "description": "A description for 'river.name'"
+  },
+  {
+    "name": "river.desc",
+    "type": "java.lang.String",
+    "description": "A description for 'river.desc'"
+  }
+]}

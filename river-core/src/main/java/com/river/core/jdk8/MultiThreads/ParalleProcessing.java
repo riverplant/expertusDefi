@@ -34,7 +34,6 @@ public class ParalleProcessing {
 			System.out.println("sum="+result);
 			if(duration<faster) faster = duration;
 		}
-
 		return faster;
 	}
 	/**Stream.iterate的parallel性能非常差,和LinkedList一样
@@ -91,4 +90,6 @@ public class ParalleProcessing {
 		}
 		return result;
 	}
+	
+	
 }

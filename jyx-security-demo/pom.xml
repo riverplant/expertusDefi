@@ -1,18 +1,43 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>jyx-security-demo</artifactId>
-  <parent>
-  	<groupId>com.jyx.security</groupId>
-  	<artifactId>jyx-security</artifactId>
-  	<version>1.0.0-SNAPSHOT</version>
-  	<relativePath>../jyx-security</relativePath>
-  </parent>
-   <dependencies>
-  <!-- 测试端先从浏览器开始，所以引入jyx-security-browser -->
-		<dependency>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jyx-security-demo</artifactId>
+	<parent>
 		<groupId>com.jyx.security</groupId>
-		<artifactId>jyx-security-browser</artifactId>
-		<version>${jyx.security.version}</version>
+		<artifactId>jyx-security</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../jyx-security</relativePath>
+	</parent>
+	<dependencies>
+		<!-- 测试端先从浏览器开始，所以引入jyx-security-browser -->
+		<dependency>
+			<groupId>com.jyx.security</groupId>
+			<artifactId>jyx-security-browser</artifactId>
+			<version>${jyx.security.version}</version>
 		</dependency>
-		</dependencies>
+		<!-- spring测试框架 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.1.2.RELEASE</version>
+				<executions>
+					<execution>
+						<goals>
+						<!-- 重新打包，按照springboot特有的方式重新打包 -->
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<finalName>gjxsecurity</finalName>
+	</build>
 </project>

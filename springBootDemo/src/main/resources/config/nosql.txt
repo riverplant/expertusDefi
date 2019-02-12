@@ -1,0 +1,58 @@
+1. Redis:
+https://github.com/MicrosoftArchive/redis/releases
+  redis.windows.conf 是redis的配置文件。
+
+　redis-server.exe  服务器端。
+
+   redis-cli  命令行客户端。
+
+　redis-benchmark：Redis性能测试工具，测试Redis在你的系统及你的配置下的读写性能。
+
+启动服务---->J:\Redis-x64-3.2.100>redis-server redis.windows.conf 
+端口号:6379
+
+Spring boot 中加入
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+启动就会自动连接redis
+
+#redis
+spring.redis.host=localhost
+spring.redis.port=6378
+spring.redis.password=123456//当外网可以访问，一定要设置密码
+spring.redis.database=0
+spring.redis.pool.max-active=8
+spring.redis.pool.max-idle=8
+spring.redis.pool.max-wait=-1
+spring.redis.pool.min-idle=0
+spring.redis.timeout=0
+
+********************************MongoDb******************************
+https://blog.csdn.net/SHU15121856/article/details/80736092
+设置db为保存数据文件夹：
+输入指令:
+L:\Program Files\MongoDB\Server\4.0\bin>mongod.exe --dbpath "L:\Program Files\Mo
+ngoDB\Server\4.0\data\db"
+访问路径:http://localhost:27017/
+
+********************缓存*************************
+1.Caching-EhCache
+<!-- caching -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+		</dependency>
+spring: 
+   cache: 
+          type: ehcache
+          ehcache:
+                   config: classpath:config/ehcache.xml
+
+2.Redis
+flushdb:清空缓存

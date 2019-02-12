@@ -1,0 +1,80 @@
+配置文件:
+1.最低配置:系统的默认属性-->SpringApplication.setDefaultProperties指定
+
+2.配置随机值:32位的随机值
+roncoo.secret=${random.value}
+#配置之后会添加元数据add metadata--> meta-inf/additional-spring-configuration-meadata.json
+#通过@Value(value = "${roncoo.secret}")来读取配置文件中的配置值
+@Value(value = "${roncoo.secret}")
+	private String roncoo_secret;
+	
+3.属性占位符:
+river.name=www.river.com
+#引用${river.name}变量
+river.desc=${river.name} is a domain name
+
+4.Application属性未见，按优先级，位置高的将覆盖位置低的
+a.当前目录下的/config子目录
+b.当前目录
+c.一个classpath下的/config包-->在resources下面创建/config(会覆盖之前的配置文件)
+d.classpath根路径(root)-->当前使用的application.properties配置文件
+
+5.应用端口配置:
+server.port=8090
+6.时间格式:可以定义Date的时间格式
+spring.jackson.date-format=yyyy-MM-dd HH:mm:ss 
+7.时区配置:默认armerican/
+spring.jackson.time-zone=Asian/Chongqing
+*******************************************************************************
+************************YAML*************************************************
+使用YAML来代替Properties(Spring建议)
+有分层的概念，
+river: 
+  secret: ${random.value}
+  number: ${random.int}
+  name: www.river.com
+#引用${river.name}变量
+  desc: ${river.name} is a domain name
+server:
+  port: 8080
+*****************************多环境配置propertie***************************************
+//用于激活哪一个配置文件(application-test.properties)同时覆盖掉主的相同配置参数
+//application-dev.properties:开发环境
+//application-pro.properties:生产环境
+//打包的时候可以选择环境
+spring.profiles.active=test(在主文件中配置:application.properties)
+
+通过命令行切换成开发工程
+java -jar app.jar --spring.profiles.active=dev
+*****************************多环境配置***************************************
+
+*****************************多环境配置yaml***************************************
+在同一个配置文件中用---来区分不同的配置，不需要另外添加文件
+通过以下来决定使用哪个
+spring: 
+   profiles: 
+            active: dev
+........................................................
+该配置文件中相同的配置文件不可以出现两个相同的key，所以需要写在一起
+
+#random:隐藏参数，默认生成随机字符串
+river: 
+  secret: ${random.value}
+#默认生成一个随机整数
+  number: ${random.int}
+  name: www.river.com
+#引用${river.name}变量
+  desc: ${river.name} is a domain name
+server:
+  port: 8080
+---
+spring: 
+   profiles: dev
+server: 
+  port: 8081
+---
+spring: 
+   profiles: pro
+server: 
+  port: 8082
+***********多环境配置yaml不能通过@PropertySource注解来加载,只有propertie文件可以************

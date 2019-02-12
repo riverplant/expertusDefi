@@ -1,0 +1,77 @@
+#添加 metadata--> meta-inf/additional-spring-configuration-meadata.json
+#读取read annotation-->@Value(value = "${roncoo.secret}")
+spring: 
+   profiles: 
+            active: dev
+ #定义读取配置文件的位置 ,不要使用logback来命名      
+logging: 
+   config: classpath:logback-spring.xml
+#logging:   
+#     config: classpath:log4j2-dev.xml
+---
+spring: 
+   profiles: dev
+   # JPA
+   jpa: 
+         hibernate: 
+                   ddl-auto: update
+         show-sql: true
+   cache: 
+          #type: ehcache
+          type: redis
+          ehcache:
+                   config: classpath:config/ehcache.xml
+   datasource: 
+              #driver-class-name: com.mysql.jdbc.Driver
+              #url: jdbc:mysql://localhost:3306/springbootdemo?useUnicode=yes&characterEncoding=UTF-8
+              #username: root
+              #password: 123456
+              #h2
+              #访问h2:http://127.0.0.1:8080/h2-console/
+              #~:代表当前操作用户对应的用户目录
+              #url: jdbc:h2:~/test;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE
+              #jdbc:h2:mem:test  该设置将数据库建立在内存上，适用于测试，每次重启会清空数据
+              #指定配置路径
+              url: jdbc:h2:file:J:/river_h2/river_spring_boot;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE
+              username: sa
+              password: 
+        
+              
+server: 
+  port: 8080
+  #random:隐藏参数，默认生成随机字符串
+river: 
+  secret: ${random.value}
+#默认生成一个随机整数
+  number: ${random.int}
+  name: www.river.com
+#引用${river.name}变量
+  desc: ${river.name} is a domain name
+  
+---
+spring: 
+   profiles: pro
+     #random:隐藏参数，默认生成随机字符串
+river: 
+  secret: ${random.value}
+#默认生成一个随机整数
+  number: ${random.int}
+  name: www.river.com
+#引用${river.name}变量
+  desc: ${river.name} is a domain name
+server: 
+  port: 8081
+    #random:隐藏参数，默认生成随机字符串
+---
+spring: 
+   profiles: test
+server: 
+  port: 8082
+  #random:隐藏参数，默认生成随机字符串
+river: 
+  secret: ${random.value}
+#默认生成一个随机整数
+  number: ${random.int}
+  name: www.river.com
+#引用${river.name}变量
+  desc: ${river.name} is a domain name

@@ -2,10 +2,7 @@ package com.river.core.MultiThreads.aqs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.AbstractQueuedSynchronizer;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+
 
 /**
  * Lock接口
