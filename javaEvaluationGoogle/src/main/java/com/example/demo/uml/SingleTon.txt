@@ -1,0 +1,25 @@
+设计模式:
+1.Singleton:
+   ->确保全局至多只有一个对象
+   -> 用于:需要统一管理的资源
+   ->创建:双重锁模式
+       -->Double checked locking:第一次在锁的外面check全局对象是否为null,如果不是null直接用
+                                                                       锁住变量后再check一次，如果依然是null就新建
+  public static Singleton getInstance()
+{
+  if (instance == null)
+  {
+    synchronized(Singleton.class) {  //1
+      if (instance == null)          //2
+        instance = new Singleton();  //3
+    }
+  }
+  return instance;
+}
+//最好将对象创建在静态变量里,或者使用框架提供的能力
+2.变继承关系为组合关系
+如何实现LoggingRunnable,TransactionalRunnable,...
+com.example.demo.oop.compagne.desginpattern.task.decorator
+***************************************************************
+3.如何创建对象
+Abstract Factory Pattern

@@ -1,0 +1,47 @@
+{
+  "groups": [
+    {
+      "name": "river",
+      "type": "com.riverplant.rspringboot.config.DataSourceProperties",
+      "sourceType": "com.riverplant.rspringboot.config.DataSourceProperties"
+    },
+    {
+      "name": "tomcat",
+      "type": "com.riverplant.rspringboot.config.TomcatProperties",
+      "sourceType": "com.riverplant.rspringboot.config.TomcatProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "river.driver-class-name",
+      "type": "java.lang.String",
+      "sourceType": "com.riverplant.rspringboot.config.DataSourceProperties"
+    },
+    {
+      "name": "river.password",
+      "type": "java.lang.String",
+      "sourceType": "com.riverplant.rspringboot.config.DataSourceProperties"
+    },
+    {
+      "name": "river.url",
+      "type": "java.lang.String",
+      "sourceType": "com.riverplant.rspringboot.config.DataSourceProperties"
+    },
+    {
+      "name": "river.username",
+      "type": "java.lang.String",
+      "sourceType": "com.riverplant.rspringboot.config.DataSourceProperties"
+    },
+    {
+      "name": "tomcat.hots",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.riverplant.rspringboot.config.TomcatProperties"
+    },
+    {
+      "name": "tomcat.port",
+      "type": "java.lang.String",
+      "sourceType": "com.riverplant.rspringboot.config.TomcatProperties"
+    }
+  ],
+  "hints": []
+}

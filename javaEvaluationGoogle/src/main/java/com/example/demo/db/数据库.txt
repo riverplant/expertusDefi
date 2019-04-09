@@ -1,0 +1,83 @@
+1.JOIN and GROUP BY
+
+SELECT * FROM TABLE1 JOIN TABLE2 (如果后面没有条件，将会在数据库中做笛卡尔积 = 表1*表2,
+会出现ID不相等的错误记录)
+SELECT * FROM TABLE1 t1 JOIN TABLE2 t2 on t1.ip = t2.ip(内连接)
+
+SELECT * FROM TABLE1 t1 left JOIN TABLE2 t2 on t1.ip = t2.ip(外链接)
+
+select p.cataid , cataname, MIN(p.price) from product p left join category c on p.id = c.id 
+group by p.id,cataname
+
+2.事务和乐观锁:
+   ACID:->Atomicity：原子性
+        ->Consistency:约束
+        ->Isolation :互相独立(隔离级别)
+        ->Durability: 结果是持久性的
+   Read uncommitted: 递交事务之前
+   Read committed:只读取committed的值
+   Repeatable Reads:
+   Serializable:
+************************************************
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN;
+SET AUTOCOMMIT = 0;
+#set tx_isolation = 'read-uncommitted';
+select @@tx_isolation;
+SELECT * FROM sd_user_log ;
+UPDATE sd_user_log  SET user_name = "riverplant222" FOR UPDATE;//FOR UPDATE将该语句锁住()
+SELECT * FROM sd_user_log ;
+ROLLBACK;
+COMMIT
+乐观锁:(当买家不是特别多)
+读取数据,记录Timestamp
+修改数据
+检查和提交数据
+//这里用AND做了一个乐观锁，当需要更新user_name = "riverplant222"时需要当时的user_name="DEMO"
+UPDATE sd_user_log  SET user_name = "riverplant222" AND user_name="DEMO"
+
+*****************************索引************************************
+1.建立索引
+->主键和外键会自动建立索引
+ALTER TABLE 'TABLE1' ADD KEY 'IDX_CATEGORY'('CATEGORYNAME')
+->创建索引:ALTER TABLE:用来创建普通索引、UNIQUE索引或PRIMARY KEY索引。
+ALTER TABLE table_name ADD INDEX index_name (column_list)
+ALTER TABLE table_name ADD UNIQUE (column_list)
+ALTER TABLE table_name ADD PRIMARY KEY (column_list)
+->CREATE INDEX:对表增加普通索引或UNIQUE索引.不能用CREATE INDEX语句创建PRIMARY KEY索引。
+CREATE INDEX index_name ON table_name (column_list)
+CREATE UNIQUE INDEX index_name ON table_name (column_list)
+在创建索引时，可以规定索引能否包含重复值。如果不包含，则索引应该创建为PRIMARY KEY或UNIQUE索引
+->删除索引:
+DROP INDEX index_name ON talbe_name
+ALTER TABLE table_name DROP INDEX index_name
+ALTER TABLE table_name DROP PRIMARY KEY
+->查看索引:
+show index from tblname;
+show keys from tblname;
+********************************************************
+2.使用Query Plan来验证索引
+EXPLAIN SELECT.....查看type可以验证是否用到了索引
+
+3.索引的实现(m阶) 
+ B 树(放在硬盘上):值可以不放在叶子节点上
+ B+树:所有的值都在叶子节点上
+ ->每个非叶子节点（除根）至多有m个儿子，至少有m/2个儿子
+ ->根节点不是叶子至少有两个儿子
+ ->所有叶子节点在同一层
+作用:加快查找速度；约束数据的值(UNIQUE INDEX,加在某个字段上,该字段不可以用重复的值)
+分类:Clustered Index:每个表只能建一个，例如主键;Non-clustered Index:可以建多个
+给经常需要查找的字段加索引，对于已经建好的赋值sql,通过Query Plan来判断
+*******************数据库连接池Connction pool*************************************************
+连接池的配置(Tomcat JDBC Connection Pool):针对数据库的客户端来维护连接池
+->maxActive:默认100
+->maxIdle:最多有多少个connections空在那里(默认100)
+->minIdle:默认10个
+->initialSize:服务器刚起来默认给数据库建立的连接,默认10个
+->maxWait:连接请求默认等待时间30000,3秒
+*************************************例题*************************
+I/O密集型操作的效率：对I/O操作密集等待，此时使用多线程效果不大
+
+
+
+

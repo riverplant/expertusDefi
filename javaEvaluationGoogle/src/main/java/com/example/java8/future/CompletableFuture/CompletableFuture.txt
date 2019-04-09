@@ -1,0 +1,201 @@
+CompletableFuture设计模式:
+
+/**自定义
+ * 通过回调接口Completable来避免等待
+ * 
+ * @author riverplant
+ *
+ */
+public class CompletableFutureInAction {
+	public static void main(String[] args) {
+		
+		Myfuture2<String> future = invoke(()->{
+			try {
+				Thread.sleep(10000L);
+				return "test success...";
+			} catch (Exception e) {
+				e.printStackTrace();
+				return "test error...";
+			}
+		} );
+		
+		future.setMyCompletalbe(new MyCompleteble2<String>() {
+
+			@Override
+			public void complete(String t) {
+				System.out.println(t);//完成后回调
+				System.out.println(future.get());
+				System.out.println(future.isdone());
+			}
+
+			@Override
+			public void exception(Throwable cause) {
+				System.out.println("error");
+				cause.printStackTrace();
+			}
+			
+		});
+		
+		System.out.println("执行其它的业务逻辑...........");
+		System.out.println(future.get());
+		System.out.println(future.isdone());
+	}
+
+	public static <T> Myfuture2<T> invoke(Mycallable2<T> callable){
+		AtomicBoolean isdone = new AtomicBoolean(false);
+		AtomicReference<T> result = new AtomicReference<T>();
+		
+		Myfuture2<T> future = new Myfuture2<T>(){
+            private MyCompleteble2<T> myCompleteble;
+			@Override
+			public T get() {
+				return result.get();
+			}
+
+			@Override
+			public boolean isdone() {
+				return isdone.get();
+			}
+
+			@Override
+			public void setMyCompletalbe(MyCompleteble2<T> myCompleteble2) {
+				this.myCompleteble = myCompleteble2;
+				
+			}
+
+			@Override
+			public MyCompleteble2<T> getMyCompleteble2() {
+				return myCompleteble;
+			}
+			
+		};//future
+		Thread t = new Thread(()->{
+			try {
+				T value = callable.Action();
+				result.set(value);
+				isdone.set(true);
+				if(future.getMyCompleteble2()!=null)future.getMyCompleteble2().complete(value);	
+			} catch (Exception e) {
+				if(future.getMyCompleteble2()!=null)future.getMyCompleteble2().exception(e);
+			}
+		});
+		t.start();
+		return future;
+	}
+	private interface Myfuture2<T>{
+		T get();
+		boolean isdone();
+		void setMyCompletalbe(MyCompleteble2<T> myCompleteble2);
+		MyCompleteble2<T> getMyCompleteble2();
+	}
+	/**
+	 * 该接口用于回调
+	 * @author riverplant
+	 *
+	 * @param <T>
+	 */
+	private interface MyCompleteble2<T>{
+		void complete(T t);
+		void exception(Throwable cause);
+	}
+	private interface Mycallable2<T>{
+		T Action();
+	}
+}
+****************************************************************************
+**************************************API**************************************
+1.supplyAsync
+2.thenApply
+3.whenComplete
+public static void main(String[] args) throws InterruptedException {
+		CompletableFuture.supplyAsync(() -> 1).thenApply(i -> Integer.sum(i, 10))//第一次异步处理
+		.thenApplyAsync(v-> Integer.sum(v, 10))//第二次异步处理
+				.whenComplete((v, t) -> System.out.println(v));
+		Thread.sleep(1000L);
+	}
+4.handle
+5.thenRun
+ExecutorService executor = Executors.newFixedThreadPool(2, r->{
+			Thread t = new Thread(r);
+			return t;
+		});
+CompletableFuture.supplyAsync(() -> 1).thenApply(i -> Integer.sum(i, 10))
+		.handle((v,t)->Integer.sum(v, 10))//此处多了对异常的考虑
+		.whenComplete((v, t) -> System.out.println(v))
+		.thenRunAsync(System.out::println, executor)//添加异步Runnable
+		.thenRun(System.out::println);//添加空格，值不会传递到这里
+		
+6.theAccept
+CompletableFuture.supplyAsync(() -> 1).thenAccept(System.out::println);
+
+7.thenCompose(重要):将一个CompletableFuture处理后的值交给另外一个CompletableFuture!!
+CompletableFuture.supplyAsync(() -> 1)
+  .thenCompose(i->CompletableFuture.supplyAsync(()->10*i))//i:第一个CompletableFuture处理后返回的值
+  .thenAccept(System.out::println);
+  
+8.thenCombine(合并)
+/**
+		 * thenCombine(CompletionStage<? extends Double> other,
+		 *  BiFunction<? superInteger, ? super Double, ? extends Double> fn)
+		 *  CompletionStage<? extends Double> other:另外的一个CompletableFuture2
+		 *  BiFunction fn: 对CompletableFuture1和CompletableFuture2的值进行操作
+		 */
+		CompletableFuture.supplyAsync(() -> 1)
+				.thenCombine(CompletableFuture.supplyAsync(() -> 2.0d), (r1, r2) -> r1 + r2)
+				.thenAccept(System.out::println);
+
+
+9.thenAcceptBoth
+CompletableFuture.supplyAsync(() -> 1)
+		.thenAcceptBoth(CompletableFuture.supplyAsync(() -> 2.0d), 
+				(r1, r2) ->System.out.println(r1 + r2) );
+
+10.runAfterBoth:所有的CompletableFuture都结束后
+
+CompletableFuture.supplyAsync(() -> {
+			System.out.println(Thread.currentThread().getName());
+			return 1;
+		}).runAfterBoth(CompletableFuture.supplyAsync(() -> {
+					System.out.println(Thread.currentThread().getName());
+					return 1;}), //第二个CompletableFuture
+					()->System.out.println("done...."));//最后调用的Runnable
+
+11.applyToEither(其中的一个执行完就传递给functionalInterface)
+/**
+ * 其中的一个完成就针对结果进行再操作(*10):用于最先响应
+*/
+CompletableFuture.supplyAsync(()->{System.out.println("T am future 1");return 1;})
+		         .applyToEither(CompletableFuture.supplyAsync(()->{System.out.println("T am future 1");return 2;}), 
+		          v->v*10).thenAccept(System.out::println);
+/**
+ * 其中的一个完成就输出:用于最先响应，不再进行操作
+    例如针对两个数据库的查询结果，谁快就用谁
+*/
+12.acceptEither
+CompletableFuture.supplyAsync(()->{System.out.println("T am future 1");return 1;})
+        .acceptEither(CompletableFuture.supplyAsync(()->{System.out.println("T am future 1");return 2;}), 
+        		System.out::println);
+
+13.runAfterEither:运行结束后运行Runnalbe-->例如通知
+
+CompletableFuture.supplyAsync(()->{System.out.println("T am future 1");return 1;})
+        .runAfterEither(CompletableFuture.supplyAsync(()->{System.out.println("T am future 1");return 2;}), 
+        		()->System.out.println("done...."));
+
+14.anyOf(静态方法)
+//只要有一个CompletableFuture完成后打印   
+  List<CompletableFuture<Double>> collect = Arrays.asList(1,2,3,4).stream()
+		      .map(i->CompletableFuture.supplyAsync(CompletableFutureInAction3::get))
+		      .collect(Collectors.toList());
+		      
+            CompletableFuture.anyOf(collect.toArray(new CompletableFuture[collect.size()] ))
+            .thenRun(()->System.out.println("done....")); //只要有一个CompletableFuture完成后打印   
+
+15.allOf(静态方法)
+//所有的CompletableFuture完成后打印   
+  List<CompletableFuture<Double>> collect = Arrays.asList(1,2,3,4).stream()
+		      .map(i->CompletableFuture.supplyAsync(CompletableFutureInAction3::get))
+		      .collect(Collectors.toList());
+		      
+            CompletableFuture.allOf(collect.toArray(new CompletableFuture[collect.size()] ))
+            .thenRun(()->System.out.println("done....")); //所有的CompletableFuture完成后打印   

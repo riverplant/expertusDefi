@@ -1,0 +1,94 @@
+1.FreeMarker
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+//不能使用@RestController,否则将无法返回视图
+@Controller
+@RequestMapping("/web")
+public class WebController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(WebController.class);
+	/**
+	 * 返回视图/templates/index.ftl
+	 * @return
+	 */
+	@RequestMapping("/index")
+	public String index(ModelMap map) {
+		logger.info("这里是WebController");
+		map.put("title", "hello world");
+		return "index";//不要加上'/'
+	}
+}
+该模板支持返回视图ftl格式
+************************************************************
+2.Thymeleaf
+该模板支持返回视图html格式
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+**************************************************************
+//不能使用@RestController,否则将无法返回视图
+@Controller
+@RequestMapping("/web")
+public class WebController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(WebController.class);
+	/**
+	 * 返回视图/templates/index.ftl
+	 * @return
+	 */
+	@RequestMapping("/index")
+	public String index(ModelMap map) {
+		logger.info("这里是WebController");
+		map.put("title", "hello world");
+		return "index";//不要加上'/'
+	}
+}
+**************************************************************
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>spring Boot Demo -Thymeleaf </title>
+</head>
+<body>Hello
+<center>
+<h1 th:text="${title}"></h1>
+</center>
+</body>
+</html>
+**************************************************************
+3.jsp:
+需要在配置文件中加入
+spring.mvc.view.prefix= /WEB-INF/templates/
+spring.mvc.view.suffix= .jsp
+3.Groovy
+
+
+4.Mustache
+**************错误处理**************************************
+
+1.spring Boot将所有错误默认映射到/error,实现ErrorController
+@Controller
+@RequestMapping(value = "error")
+public class MyErrorController implements ErrorController {
+
+	private static final Logger logger = LoggerFactory.getLogger(MyErrorController.class);
+
+	@Override
+	public String getErrorPath() {
+		logger.info("出错，进入自定义错误控制器");
+		return "error/error";
+	}
+
+	@RequestMapping
+	public String error() {
+		return getErrorPath();
+	}
+}
+使用注解@ControllerAdvice
+
+
+

@@ -1,0 +1,15 @@
+*List<Dish> menus
+1.Sequence of elements:在Souce中的成员，Dish
+
+
+
+2.Source:menus
+
+
+3.Data processing operations:filter,map,sorted,collect...
+
+Pipelining:流式，可以链式调用
+
+
+Internal iteration:所有动作发生在内部
+**********stream->filter->map->limit->collect****************

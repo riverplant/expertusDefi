@@ -1,0 +1,8 @@
+1.abstractFactory 
+task = new LoggingTask(new CodingTask);
+task = taskFactory.createCodingTask();
+
+2.builder Pattern
+employee = Employee.fromExisting(oldEmployee)
+                   .withSalary(150000)
+                   .build();

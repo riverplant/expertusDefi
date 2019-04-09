@@ -1,0 +1,21 @@
+Spring
+
+1.IOC(Inversion of Control):控制反转
+-> Dependency Inversion: 依赖注入:把底层类作为参数传给上层类，实现上层对下层的控制
+->Setter:
+->Interface:
+->Constructor:
+->Annotation:
+
+BeanDefinition:
+BeanDefinitionRegistry:提供向IOC容器注册BeanDefinition对象的方法
+BeanFactory:IOC配置；包括Bean的各种定义，建立Bean，Bean生命周期控制
+ApplicationContext:
+      ->BeanFactory:管理和装配Bean
+      ->ResourcePatternResolver:加载资源文件
+      ->MessageSource:实现国际化功能
+      ->ApplicationEventPublisher:注册监听器，实现监听机制
+      
+      
+************************AOP面向切片编程(Aspect)**********************************
+对web方面的请求做日志记录

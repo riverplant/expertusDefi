@@ -1,0 +1,34 @@
+1.lambda的语法
+   //断言
+--> public interface Predicate<T>{boolean test(T t);}
+  Predicate<Apple> predicate = (Apple a)->a.getColor.equals("green");
+
+   //消费者，一个参数，无返回值
+-->public interface Consumer<T> {
+   void accept(T t);
+}
+   //函数
+-->public interfrace Function<T,R>{
+   R apply(T t);
+}
+  Function<Apple,boolean> fun = (a)->a.getColor.equal("red");//Predicate<T>
+
+//供应商 无入参，有返回值
+-->public interface Supplier<T>{ T get();} 
+Supplier<Apple> supplier = ()->new Apple();
+
+2.在哪里如何使用lambda
+
+3.execute around pattern
+
+
+4.Functional interface
+
+
+5.Method references
+
+
+6.Type reference
+
+
+7.Composing lambdas

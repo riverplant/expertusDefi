@@ -1,0 +1,117 @@
+SpringSecurity
+安全拦截器：
+    1.认证管理器：
+      
+    
+    2.访问决策管理器：
+  
+  
+    3.运行身份管理器：
+    
+ ************************************权限拦截器**************************************
+ 
+  1. SecurityContextPersistencefilter(顶端过滤器):判断session是否存在一个SpringSecurityContext
+           如果存在，将SpringSecurityContext取出放入SecurityContextHolder中
+           不存在，就创建一个 (ThreaeLocal:)
+  2. LogoutFilter:处理注销请求
+  3. AbstractAuthenticationProcessingFilter:处理Form提交请求
+  4. DefaultLoginPageGeneratingFilter:生成默认的登录页面,默认的访问地址:spring_security_login
+  5.BasicAuthenticationFilter:Basic验证
+  6.SecurityContextHolderAwareRequestFilter:在请求的基础上，为后序程序提供额外的数据
+  7.RememberMeAuthenticationFilter:根据Cookie中的RememberMe标记，自动实现客户登录，并且创建securityContext
+  8.AnonymousAuthenticationFilter:保证操作统一性，在用户没有登录，使用匿名用户
+  9.ExceptionTranslationFilter:处理FilterSecurityIntecepter中抛出的异常
+  10.SessionManagementFilter:用户成功登录后，销毁原有session并且重新设置一个session
+  11.FilterSecurityInterceptor:用户的权限控制
+      ->用户没有登录:抛出未认证异常
+      ->用户登录但是没有访问资源的权限:拒绝访问的异常
+      ->放行
+ FilterChainProxy:按照顺序来调用一组Filter，使得filter技能完成认证授权，又能使用SpringIOC 
+ *******************************UserDetailsService****************************************
+  interface UserDetailsService: UserDetails loadUserByUsername(String username){}
+  //用户安全信息的源
+  interface UserDetails: {//可以从数据库中返回
+  Collection<? extends GrantedAuthority> getAuthorities(); //权限集合
+  String getPassword();
+  String getUsername();
+  boolean isAccountNonExpired();//账户没有过期
+  boolean isAccountNonLocked();//账户没有被锁定
+  boolean isCredentialsNonExpired();//证书没有过期
+  boolean isEnabled();//账户是否有效
+  } 
+  //使用SpringSecurity安全访问的对象
+  interface Authentication extends Principal: {
+  Collection<> getAuthorities(); //权限集合
+  Object getCredentials();//获取凭证
+  Object getDetails();//获取认证一些额外信息
+  Object getPrincipal();//获取认证的实体
+  boolean isAuthenticated();//是否通过认证
+  void setAuthenticated(boolean isAUthenticated);//证书没有过期 
+  } 
+  将Authentication对象和UserDetailsService进行匹配，
+  将UserDetailsService的getAuthorities设置到Authentication,组成完整的Authentication对象
+ 
+ 用户表、权限表、角色表、用户和角色关系表、角色和权限关系表
+ ****************************权限缓存*************************************************** 
+ class CacheingUserDetailsService  implements UserdetailsService{
+ private UserCache userCache = new NullUserCache();
+ private final UserDetailsService delegate;
+ CacheingUserDetailsService(UserDetailsService delegate){
+ this.delegate =delegate; 
+ }}
+ 
+*************************************自定义决策AbstractAccessDecisionManager***********************
+ AbstractAccessDecisionManager
+ //投票器，有无访问的最终决定权由投票器来决定
+ public interface AccessDecisionVoter<S>{
+  int ACCESS_GRANTED = 1;
+   int ACCESS_ABSTAIN = 0;
+    int ACCESS_DENIED = -1;
+  
+  public class RoleVoter implements AccessDecisionVoter<Object>{
+  
+  }
+  投票器:decide(Authentication authentication,Object boj,Collection<ConfigAttribute> attributes)方法
+  1.AffirmatibeBased:一票通过，只有一个投票器通过就可以访问
+  2.ConsensusBased:有一半以上投票通过，才可以访问资源
+  3.UnanimousBased:所有投票器通过，才可以访问
+ }
+ **************************************case*****************************
+1.只要能登录:
+@Configuration
+@EnableWebSecurity
+public class MySpringSecurityConfig extends WebSecurityConfigurerAdapter{
+
+	@Override//
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.inMemoryAuthentication().withUser("admin").password("{noop}123456").roles("ADMIN");
+		auth.inMemoryAuthentication().withUser("root").password("123456").roles("USER");
+	}
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests()
+		     .antMatchers("/").permitAll()
+		     .anyRequest().authenticated()
+		     .and()
+		     .logout().permitAll()
+		     .and()
+		     .formLogin();
+		http.csrf().disable();
+	}
+	
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers("/js/**","/css/**","/images/*","/fonts/**","/**/*.png","/**/*.jpg");
+	}
+ 
+ 2.指定的角色，每个角色有指定的权限:
+@RestController
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class LoggingController {
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")//roleVoter
+    @RequestMapping(value = "/roleAuth", method = RequestMethod.GET)
+   	public String role() {
+   		return "helloooooooo springboot";
+   	}
+}

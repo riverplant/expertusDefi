@@ -1,0 +1,17 @@
+并发
+ArrayList         Excellent
+LinkedList        Poor
+IntStream.range   Excellent
+Stream.iterate    Poor
+HashSet           Good
+TreeSet           Good
+*********************ForkJoin***************************************
+1.ForkJoinPool:
+
+
+2.RecursiveTask:有返回值
+
+
+3.RecursiveAction: 无返回值
+
+*********************ForkJoin***************************************

@@ -1,0 +1,116 @@
+面向对象
+1.不可变对象(重要):创建完的对象不可变：Immutable Objects
+->可以引用传递，可以缓存
+->线程安全
+final 关键字:
+          类申明: 不可以被继承
+       函数申明: 不可以在派生类中重写
+      变量申明:  变量不可以指向其它对象
+   static final变量 -> 用于定义常量，名称一般大写
+通过：从接口定义，类的实现 上保证不可变性**********************************
+接口定义:
+类的实现:
+                  一般来说希望所有的类的成员变量都是private final
+Collections.unmodifiable
+
+
+2.泛型
+语法:
+List<Integer> list = new ArrayList<>();//<>规定了该list是泛型
+List<Integer> list = LinkedList.of(1,2,3);
+List<Integer> list = LinkedList.newEmptyList();
+class ArrayList<T> {...}
+public <T> void pringList(List(V) list){...
+static:public static <T> MyLinkedList<T> newEmptyList() {
+		return new MyLinkedList<T>();
+	}
+
+********************************************************************
+ArrayList<Integer>是List<Integer>吗?   是
+
+List<Integer>是List<Object>?   no-->
+
+把List<Integer>转换成List<Object>  new ArrayList<Object>(intList);//将intList中的每一个元素放入
+
+(List<Object>)(List)intList;//通过早期语法List不带括号来进行强转
+
+
+**********************************************************************
+3.类的特殊函数：
+  ->构造函数
+  ->equals:
+  @Override
+public boolean equals(Object obj) {
+	if (this == obj)
+		return true;
+	if (obj == null)
+		return false;
+	if (getClass() != obj.getClass())
+		return false;
+	Employee other = (Employee) obj;
+	if (name == null) {
+		if (other.name != null)
+			return false;
+	} else if (!name.equals(other.name))
+		return false;
+	if (slary != other.slary)
+		return false;
+	return true;
+}
+->  a.hashCode() == b.hashCode()  有可能 a.equals(b) 
+->  a.equals(b)  可以判斷a.hashCode() == b.hashCode()
+*******************
+  ->hashCode
+  @Override
+public int hashCode() {
+	return Objects.hash(this.name,this.slary);
+}
+  ->toString
+  @Override
+public String toString() {
+	return "Employee [name=" + name 
+			+ ", slary=" + slary + "]";
+}
+************************************************************
+1.普通函数引用静态变量、函数        OK
+2.对象上引用静态变量、函数            OK，编译器警告
+3.静态函数引用普通成员变量、函数   错误
+*************************************************************
+抽象类(abstract):从维护角度
+接口（contract）:从用户角度、强调合约、强制协作双方无法犯错
+接口和抽象类的比较:
+            ->抽象类可以用成员变量
+            ->抽象类可以用部分实现,实现不了的用abstract来申明，让继承类去实现
+            ->抽象类不可以多重继承，接口可以多重继承
+
+ 派生类中修改封装可见性:
+     private ->public 可以      
+     public ->private 不可以           
+     
+**********************程序运行结果**********************************
+class A{
+public int func1(int a,  int b){
+return a-b;
+}
+}//A
+class B extends A{
+public int func1(int a,int b){
+return a+b;
+}
+} 
+
+public class ChildClass{
+public static void main(String[] args){
+A a = new B();//最终调的对象都是B 
+B b = new B();
+System.out.println(a.func1(100,50));//150
+System.out.println(b.func1(100,50));//150
+}
+}   
+
+********************************************************
+1.接口，抽象类的区别
+   ->接口定义了函数但是不实现，抽象类可以实现，接口可以多继承
+2.访问控制修饰符:private public protect 
+3.final:可以加在变量、方法
+4.泛型:方法可以操作很多类型的对象

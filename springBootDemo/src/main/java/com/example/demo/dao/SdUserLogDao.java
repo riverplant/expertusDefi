@@ -19,7 +19,7 @@ public interface SdUserLogDao extends JpaRepository<SdUserLog, Integer>{
 	@Query(value="from SdUserLog sdu where sdu.userName=?1")//写了注解后会优先执行，hql语句?需要改成jpa-style
 	List<SdUserLog> findByUserName(String name);
 	
-	SdUserLog findOne(Integer id);
+	//SdUserLog findOne(Integer id);
 	
 	SdUserLog findByUserIp(String name);
 	//JPA内置解析方式,不需要写实现方法，自动实现

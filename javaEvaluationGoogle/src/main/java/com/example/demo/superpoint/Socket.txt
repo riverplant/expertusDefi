@@ -1,0 +1,7 @@
+NIO 异步处理用户请求  Channel:所有要等待的(ServerSocketChannel):通过Selector选择有数据的Channel
+
+1.Socket clientSocket = serverSocket.accept();// 接收客户端连接
+
+2.String request = input.nextLine();//等待用户输入下一行
+
+缺点:使用单线程

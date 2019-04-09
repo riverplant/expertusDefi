@@ -1,14 +1,19 @@
 package com.example.demo.controller;
 
 import java.time.LocalDate;
+import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.bean.SdUserLog;
 import com.example.demo.bean.User;
+import com.example.demo.ehcache.SdUserLogCache;
+import com.example.demo.ehcache.impl.SdUserLogCachImpl;
 
 /**
  * @ResponseBody:将字符串返回
@@ -35,6 +40,8 @@ public class IndexController {
 	public String index() {
 		return "hello index";
 	}
+	@Autowired
+	private SdUserLogCache sdUserLogCache;
 
 	@RequestMapping(value = "/find/{id:\\d+}/{name}")
 	public User find(@PathVariable int id, @PathVariable String name) {
@@ -45,6 +52,19 @@ public class IndexController {
 		user.setDate(LocalDate.now());
 		user.setDes(river_desc);
 		return user;
+	}
+	
+	@RequestMapping(value = "/findredis/{id:\\d+}/{name}")
+	public SdUserLog findRedis(@PathVariable int id, @PathVariable String name) {
+		// public User find(@RequestBody User user) {
+		SdUserLog sdUserLog = new SdUserLog();
+		sdUserLog.setId(1);
+		sdUserLog.setUserIp("127.0.0.2");
+		sdUserLog.setUserName(name);
+		sdUserLog.setCreateTime(new Date());
+		sdUserLogCache.selectById(id);
+		//System.out.println(sdUserLogCache.updateById(sdUserLog));
+		return sdUserLog;
 	}
 	@RequestMapping(value = "/error")
 	public String error() {

@@ -1,0 +1,219 @@
+------------redis--------------------------
+需要启动redis
+需要序列化bean:
+@Entity
+public class SdUserLog implements Serializable{
+    
+	private static final long serialVersionUID = 1L;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+    @Column
+    private Date createTime;
+    @Column
+    private String userName;
+    @Column
+    private String userIp;
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Date getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getUserIp() {
+		return userIp;
+	}
+	public void setUserIp(String userIp) {
+		this.userIp = userIp;
+	}
+    
+}
+------------------------------------------------
+在配置文件中指定缓存文件:
+spring.cache.type=redis
+spring.cache.ehcache.config=classpath:config/ehcache.xml
+---------------------------------------------------------------------------
+ehcache.xml:
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="ehcache.xsd">
+<cached name="riverCache"
+        eternal="false"
+        maxEntriesLocalHeap="0"
+        timeToIdleSeconds="200"></cached>
+<!--eternal: true 表示对象永不过期，此时会忽略timeToIdleSeconds和timeToLiveSeconds属性，默认为false -->
+<!-- maxEntriesLocalHeap:堆内存中最大缓存对象数，0没有限制 -->
+<!-- timeToIdleSeconds:容许对象处于空闲状态的最长时间，以秒为单位 -->
+</ehcache>
+-----------------------------------------------------------------------------
+/**
+ * 缓存接口,从缓存中操作
+ * @author riverplant
+ *
+ */
+public interface SdUserLogCache {
+/**
+ * 查询
+ * @param id
+ * @return
+ */
+	SdUserLog selectById(Integer id);
+	/**
+	 * 更新
+	 * @param sdUserLog
+	 * @return
+	 */
+	SdUserLog updateById(SdUserLog sdUserLog);
+	/**
+	 * 删除-->清空缓存
+	 * @param id
+	 * @return
+	 */
+	String deletById(Integer id);
+}
+-----------------------------------------------------------------
+@CacheConfig(cacheNames = "riverCache")//通过缓存类名来关联缓存的配置
+@Repository//该注解代表持久层
+public class SdUserLogCachImpl implements SdUserLogCache {
+	@Autowired
+	private SdUserLogDao sdUserLogDao;
+	
+    @Cacheable(key = "#p0")//先从缓存中读取数据，如果没有再调用方法获取数据，然后加入缓存
+	@Override
+	public SdUserLog selectById(Integer id) {
+		//进入该方法就证明缓存中没有
+    	System.out.println("缓存中没有，直接读库,id="+id);
+		return sdUserLogDao.getOne(id);
+	}
+    @CachePut(key = "#p0")//每次都触发真是方法，然后进行缓存，适用于更新和插入
+	@Override
+	public SdUserLog updateById(SdUserLog sdUserLog) {
+		// TODO Auto-generated method stub
+		return sdUserLogDao.save(sdUserLog);
+	}
+    @CacheEvict(key = "#p0")//根据一定条件对缓存进行清空，适用于删除
+	@Override
+	public String deletById(Integer id) {
+		// TODO Auto-generated method stub
+		return "清空缓存成功";
+	}
+
+}
+-----------------------------------------------------------------
+使用JPA来操作数据库
+//public interface SdUserLogDao extends MongoRepository<SdUserLog, Integer>使用方法完全相同
+public interface SdUserLogDao extends JpaRepository<SdUserLog, Integer>{
+	@Query(value="from SdUserLog sdu where sdu.userName=?1")//写了注解后会优先执行，hql语句?需要改成jpa-style
+	List<SdUserLog> findByUserName(String name);
+	
+	//SdUserLog findOne(Integer id);
+	
+	SdUserLog findByUserIp(String name);
+	//JPA内置解析方式,不需要写实现方法，自动实现
+	SdUserLog findByUserIpAndUserName(String ip,String name);
+
+	Page<SdUserLog> findByUserName(String string, Pageable pageable);
+}
+-------------redis语句----------------------------
+flushdb
+key*
+-----------缓存管理器来做策略的配置--------------
+/**
+ * redis 自定义缓存管理器
+ */
+@Configuration
+public class MyRedisCacheConfiguration extends CachingConfigurerSupport {
+	/**
+	 * 自定义缓存管理器.
+	 * 
+	 * @param redisTemplate
+	 * @return
+	 */
+	@Bean
+	public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+		 RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+	                .entryTtl(Duration.ofHours(1)); // 设置缓存有效期一小时
+
+		RedisCacheManager redisCacheManager  =   RedisCacheManager
+                .builder(RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))
+                .cacheDefaults(redisCacheConfiguration).build();
+		
+		return redisCacheManager;
+    }	
+	/**
+	 * 自定义缓存key. 此方法将会根据类名+方法名+所有参数的值生成唯一的一个key,即使@Cacheable中的value属性一样，key也会不一样。
+	 */
+	@Override
+	public KeyGenerator keyGenerator() {
+		return new KeyGenerator() {
+			@Override
+			public Object generate(Object o, Method method, Object... objects) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(o.getClass().getName());
+				sb.append(method.getName());
+				for (Object obj : objects) {
+					sb.append(obj.toString());
+				}
+				return sb.toString();
+			}
+		};
+	}
+}
+--------------------------------异步消息-----------------------------------------
+------------------------JAVA消息中间件---------------------------------------
+JMS:ActiveMQ  AMQP
+-> 消费者/订阅者 ： 接收并处理消息的客户端
+-> 消息 ： 应用程序之间传递的数据内容
+-> 消息模式: 客户端之间传递消息的方式，JMS定义了主题和队列两种模式
+队列模式:生产者和消费者
+                队列中的消息只能被一个消费者消费
+               消费者可以随时消费队列中的消息（所有消费者的所有连接都分别收到不同的消息片段）
+主题模式:发布者和订阅者
+               主题中的消息被所有订阅者消费
+               消费者不能消费订阅之前就发送到主题中的消息（每一个消费者的每一条连接都会收到完整的所有的消息）
+               订阅者必须提前预定该消息，否则无法收到发布的消息
+JMS 编码接口
+    ConnectionFactory 创建连接到消息中间件的连接工厂
+    Connection 应用程序和消息服务器之间的通信链路
+    Destination 消息发布和接收的地点，包括队列或主题     
+    Session 单线程的上下文，用于发送和接收消息
+    MessageConsumer(消费者) 由会话创建，用于接收发送到目标的消息
+    MessageProducer(生产者) :由会话创建，用于发送消息到目标
+    Message: 在消费者和生产者之间传送的对象，消息头，一组消息属性，一个消息体
+    
+    ConnectionFactory ---(Create)--->Connection---(Create)--->Session
+           MessageConsumer(消费者) <---(Create)---Session---(Create)--->MessageProducer(生产者)
+    Session---(Create)--->Message        
+    MessageProducer---Send to -->Destination
+    MessageConsumer---Receive from-->Destination
+    
+ 下载地址:http://activemq.apache.org/activemq-5158-release.html
+ linux 启动: ./activemq start
+   
+在启动函数上添加@EnableJms
+设置队列：
+/**
+ * jms-activeMQ队列设置
+ * @author riverplant
+ *
+ */
+@Configuration
+public class MyJmsConfiguration {
+	@Bean
+    public Queue queue() {
+    	return new ActiveMQQueue("river.queue");
+    }
+}
+
+

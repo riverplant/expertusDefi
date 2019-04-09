@@ -1,0 +1,8 @@
+运行流程:
+1.判断是否web环境
+2.所有classpath的 META-INF/spring.faoctories 配置的ApplicationContextInitializer
+3.所有classpath的 META-INF/spring.faoctories 配置的ApplicationListener
+4.推断main方法所在的类
+5.执行run方法
+6.设置java.awt.headless系统变量
+7.所有classpath的 META-INF/spring.faoctories 配置的SpringApplicationRunListeners//在不同的时间点发送事件通知

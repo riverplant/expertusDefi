@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.example.demo.bean.SdUserLog;
 import com.example.demo.bean.Sduser;
+import com.example.demo.component.MyJmsComponent;
 import com.example.demo.component.RedisComponent;
 import com.example.demo.controller.IndexController;
 import com.example.demo.dao.SdUserLogDao;
@@ -37,6 +38,9 @@ public class SpringBootDemoApplicationTests {
 	@Autowired
 	private SdUserLogMongoDao sdUserLogMongoDao;
 	
+	@Autowired
+	private MyJmsComponent myJmsComponent;
+	
     private MockMvc mvc;
 //    @Autowired
 //	private WebApplicationContext wac;
@@ -44,6 +48,10 @@ public class SpringBootDemoApplicationTests {
     public void before() {
     	//mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();// setup mvc
     	 mvc = MockMvcBuilders.standaloneSetup(new IndexController()).build();
+    }
+    @Test
+    public void send() {
+    	myJmsComponent.send("hello jie,bon courage");
     }
     @Test
     public void set() {

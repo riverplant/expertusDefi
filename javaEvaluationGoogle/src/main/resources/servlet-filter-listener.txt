@@ -1,0 +1,103 @@
+***********************servlet*************************
+1.创建HttpServlet的子类servlet
+public class MyServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String protocol = req.getProtocol();
+		doPost(req, resp);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		String protocol = req.getProtocol();
+		resp.getWriter().write("hello,servlet");
+
+	}
+}
+2.在SpringBootDemoApplication中注册为bean
+
+@Bean//在这里注册MyServlet
+	public ServletRegistrationBean<MyServlet> servletRegistrationBean() {
+		return new ServletRegistrationBean<MyServlet>(new MyServlet(),"/river");
+	}
+	
+****************************servlet**************************************
+******************************filter*********************************
+
+1.
+public class MyFilter implements Filter{
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		System.out.println("XsstFilter init...");
+
+	}
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		chain.doFilter((HttpServletRequest) request, response);
+
+	}
+
+	@Override
+	public void destroy() {
+		System.out.println("XsstFilter destroy...");
+
+	}
+	
+2.@Bean//在这里注册MyFilter
+	public FilterRegistrationBean<MyFilter> filterRegistrationBean() {
+		//拦截MyServlet
+		return new FilterRegistrationBean<MyFilter>(new MyFilter(),servletRegistrationBean());
+		//拦截全部请求
+		return new FilterRegistrationBean<MyFilter>(new MyFilter());
+	}
+	
+******************************filter*********************************
+*******************************Listener******************************
+1.
+public class MyListener implements ServletContextListener {
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		System.out.println("contextInitialized");
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+		System.out.println("contextDestroyed");
+	}
+}
+2.
+@Bean//在这里注册MyListener
+	public ServletListenerRegistrationBean<MyListener> servletListenerRegistrationBean() {
+		//拦截MyServlet
+		//return new FilterRegistrationBean<MyFilter>(new MyFilter(),servletRegistrationBean());
+		//拦截全部请求
+		return new ServletListenerRegistrationBean<MyListener>(new MyListener());
+	}
+*******************************Listener******************************
+@SpringBootApplication
+public class SpringBootDemoApplication2 implements ServletContextInitializer {
+!!可以通过该方法一次注入
+/**
+	 * 将servlet/filter/listener的注入工作在这里完成
+	 */
+	@Override
+	public void onStartup(ServletContext servletContext) throws ServletException {
+		servletContext.addServlet("MyServlet", new MyServlet()).addMapping("/river");
+		servletContext.addFilter("MyFilter", new MyFilter()).addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), true, "MyServlet");
+		servletContext.addListener(new MyListener());
+
+	}
+}
+*****************springboot配置方法***********************
+1.@ServletComponentScan：在SpringbootDemoApplication类加入这个注解、
+2.@WebServlet(urlPatterns="/river",name="myServlet") servlet上加入这个注解
+3.//@WebFilter(urlPatterns = "/*")
+//@WebFilter(servletNames = {"myServlet1", "myServlet2"})
+@WebFilter(servletNames = "myServlet")
+4.@WebListener
+

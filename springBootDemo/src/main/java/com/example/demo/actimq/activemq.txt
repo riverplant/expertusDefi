@@ -1,0 +1,9 @@
+使用JMS接口规范连接ActiveMQ
+1.创建生产者
+2.创建发布者
+3.创建消费者
+4.创建订阅者
+****************************Spring 继承JMS连接ActiveMQ************************
+ConnectionFactory 用于管理连接的连接工厂
+JmsTemplate 用于发送和接收消息的模板
+MessageListerner 消息监听器

@@ -47,9 +47,4 @@ public class SdUserLog implements Serializable{
 		this.userIp = userIp;
 	}
     
-    
-    
-    
-    
-    
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.bean.SdUserLog;
 import com.example.demo.dao.SdUserLogDao;
 import com.example.demo.ehcache.SdUserLogCache;
-@CacheConfig(cacheNames = "riverCache")
+@CacheConfig(cacheNames = "riverCache")//使用的缓存名字，用于缓存配置的查找
 @Repository//该注解代表持久层
 public class SdUserLogCachImpl implements SdUserLogCache {
 	@Autowired
@@ -21,7 +21,7 @@ public class SdUserLogCachImpl implements SdUserLogCache {
 	public SdUserLog selectById(Integer id) {
 		//进入该方法就证明缓存中没有
     	System.out.println("缓存中没有，直接读库,id="+id);
-		return sdUserLogDao.findOne(id);
+		return sdUserLogDao.getOne(id);
 	}
     @CachePut(key = "#p0")//每次都触发真是方法，然后进行缓存，适用于更新和插入
 	@Override

@@ -10,6 +10,7 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jms.annotation.EnableJms;
 
 import com.example.demo.util.filter.MyFilter;
 import com.example.demo.util.listener.MyListener;
@@ -19,6 +20,7 @@ import com.example.demo.util.servlet.MyServlet;
  * @author riverplant
  *
  */
+@EnableJms//启用ActiveMQ
 @EnableCaching//该注解用于启动缓存
 @ServletComponentScan//该注解用于注入filter\servlet\lisentner
 @SpringBootApplication
