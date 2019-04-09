@@ -12,6 +12,7 @@ public class RepostoryTest extends BaseTest{
 	private EmployeeRepository employeeRepository;
 	@Test
 	public void test1() {
+		
 		employeeRepository.findByfirstName("david");
 	}
 }
