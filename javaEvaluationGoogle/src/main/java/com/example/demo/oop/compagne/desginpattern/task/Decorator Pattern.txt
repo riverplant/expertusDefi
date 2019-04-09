@@ -1,7 +1,0 @@
-变继承关系为组合关系
-!interface Runnable{
- void run();
-}
-如何实现LoggingRunnable,TransactionalRunnable,...
-
-Decorator Pattern:Runnable 接口--> CodingTask implements Runnalbe

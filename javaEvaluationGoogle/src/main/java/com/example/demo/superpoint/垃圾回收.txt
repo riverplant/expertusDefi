@@ -1,9 +1,0 @@
-JAVA垃圾回收:
-
-  1. 确定垃圾: 
-           垃圾回收的根节点:
-            ->局部变量
-            ->静态变量
-            ->活动线程，等待中的Monitor(wait,notify,synchronized)
-  2.朴素算法:Mark and Sweep
-            
