@@ -1,5 +1,4 @@
 package com.riverplant.expertus.defi.outils;
-import java.io.*;
 import java.security.*;
 public class MD5Util {
 	/**

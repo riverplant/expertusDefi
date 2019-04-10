@@ -14,5 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes=App.class)
 @Transactional
 public class BaseTest 
-{  
+{ 
+	
 }

@@ -3,28 +3,30 @@ package com.riverplant.expertus.defi.domain;
 import javax.persistence.*;
 
 @Entity
-public class Employee {
-
-	@Id
-	@GeneratedValue
-	private Integer id;
+public class Employee extends DomainImpl {
+	
 	@Column(name = "first_name", nullable = false)
 	private String firstName;
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
 	@Column(name = "email", nullable = false)
 	private String email;
+	
+	@Column(name = "password", nullable = false)
+	private String password;
+	
+	
+	
+	public String getPassword() {
+		return password;
+	}
 
-   
-	Employee() {
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Employee() {
 		// JPA only
-	}
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public String getFirstName() {
@@ -51,5 +53,14 @@ public class Employee {
 		this.email = email;
 	}
 
+	public Employee(String firstName, String lastName, String email, String password) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+	}
+
+	
 
 }
