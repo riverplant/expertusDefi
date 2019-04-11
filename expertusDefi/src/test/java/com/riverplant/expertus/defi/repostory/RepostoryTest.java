@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import com.riverplant.expertus.defi.BaseTest;
 import com.riverplant.expertus.defi.domain.Employee;
-import com.riverplant.expertus.defi.interfaces.EmployeeRepository;
+import com.riverplant.expertus.defi.repository.EmployeeRepository;
 
 public class RepostoryTest extends BaseTest{
 

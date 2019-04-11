@@ -1,5 +1,7 @@
 package com.riverplant.expertus.defi.domain;
 
+import java.util.Date;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,7 +17,16 @@ public class Employee extends DomainImpl {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
-	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createdTime = new Date();
+
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
+	}
 	
 	public String getPassword() {
 		return password;
@@ -53,13 +64,16 @@ public class Employee extends DomainImpl {
 		this.email = email;
 	}
 
-	public Employee(String firstName, String lastName, String email, String password) {
+	public Employee(String firstName, String lastName, String email, String password, Date createdTime) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
+		this.createdTime = createdTime;
 	}
+
+	
 
 	
 
